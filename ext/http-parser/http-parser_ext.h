@@ -11,21 +11,20 @@
 #include "http_parser.h"
 #include <string.h>
 
+#define true 1
+#define false 0
+
 extern VALUE mHttp;                /* module Http */
 extern VALUE cHttpParser;          /* class Http::Parser */
 extern VALUE cHttpRequestParser;   /* class Http::RequestParser */
 extern VALUE cHttpResponseParser;  /* class Http::ResponseParser */
 extern VALUE eHttpParserError;     /* class Http::Parser::Error */
 
-/*
- * constants
- */
-
-
 /**
  * Methods for Parser
  */
 VALUE hpe_alloc( VALUE klass );
+
 
 /**
  * Methods for RequestParser

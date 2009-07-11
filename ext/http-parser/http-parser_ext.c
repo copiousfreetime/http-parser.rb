@@ -3,6 +3,7 @@
  * All rights reserved.  See LICENSE and/or COPYING for details.
  *
  * vim: shiftwidth=4
+ * vim: textwidth-72
  */
 
 #include "http-parser_ext.h"
@@ -13,6 +14,73 @@ VALUE cHttpParser;          /* class Http::Parser */
 VALUE cHttpRequestParser;   /* class Http::RequestParser */
 VALUE cHttpResponseParser;  /* class Http::ResponseParser */
 VALUE eHttpParserError;     /* class Http::Parser::Error  */
+
+/* generator for callback setter */
+#define HPE_CALLBACK_SETTER(FOR,CB_TYPE)                              \
+VALUE hpe_parser_##FOR( VALUE self, VALUE callable )                  \
+{                                                                     \
+    http_parser *parser;                                              \
+    Data_Get_Struct( self, http_parser, parser );                     \
+    if ( Qnil == callable ) {                                         \
+        parser->FOR = NULL;                                           \
+    } else {                                                          \
+        parser->FOR = (http_##CB_TYPE)hpe_##FOR##_##CB_TYPE;          \
+    }                                                                 \
+}
+
+
+/* generator for callback methods */
+#define HPE_CALLBACK(FOR)                                              \
+int hpe_##FOR##_cb( http_parser *parser )                              \
+{                                                                      \
+    VALUE rb_parser = (VALUE)parser->data;                             \
+    VALUE callable  = rb_iv_get( rb_parser, "@" #FOR "_callback" );    \
+                                                                       \
+    if ( Qnil != callable ) {                                          \
+        VALUE result = rb_funcall(callable, rb_intern("call"),         \
+                                  1, rb_parser );                      \
+        if ( ( Qfalse != result ) && ( Qnil != result ) ) {            \
+            return true;                                               \
+        }                                                              \
+    }                                                                  \
+    return false;                                                      \
+};                                                                     \
+HPE_CALLBACK_SETTER(FOR,cb)
+
+
+#define HPE_DATA_CALLBACK(FOR)                                         \
+int hpe_##FOR##_data_cb( http_parser *parser,                          \
+                         const char *at, size_t length)                \
+{                                                                      \
+    VALUE rb_parser = (VALUE)parser->data;                             \
+    VALUE callable  = rb_iv_get( rb_parser, "@" #FOR "_callback" );    \
+                                                                       \
+    if ( Qnil != callable ) {                                          \
+        VALUE str    = rb_str_new( at, length );                       \
+        VALUE result = rb_funcall(callable, rb_intern("call"),         \
+                                  2, rb_parser, str );                 \
+        if ( ( Qfalse != result ) && ( Qnil != result ) ) {            \
+            return true;                                               \
+        }                                                              \
+    }                                                                  \
+    return false;                                                      \
+};                                                                     \
+HPE_CALLBACK_SETTER(FOR,data_cb)
+
+/* common callacks */
+HPE_CALLBACK(on_message_begin);
+HPE_DATA_CALLBACK(on_header_field);
+HPE_DATA_CALLBACK(on_header_value);
+HPE_CALLBACK(on_headers_complete);
+HPE_DATA_CALLBACK(on_body);
+HPE_CALLBACK(on_message_complete);
+
+/* only used by Http::Request */
+HPE_DATA_CALLBACK(on_path);
+HPE_DATA_CALLBACK(on_query_string);
+HPE_DATA_CALLBACK(on_uri);
+HPE_DATA_CALLBACK(on_fragment);
+
 
 /* free the http_parser memory */
 void hpe_free( http_parser* parser )
@@ -136,7 +204,7 @@ VALUE hpe_parser_keep_alive( VALUE self )
 
     Data_Get_Struct( self, http_parser, parser );
 
-    if ( http_parse_should_keep_alive( parser ) ) {
+    if ( http_parser_should_keep_alive( parser ) ) {
         return Qtrue;
     } else {
         return Qfalse;
@@ -167,8 +235,75 @@ VALUE hpe_parser_content_length( VALUE self )
 
 /*
  * call-seq:
+ *   parser.has_error? -> true or false
+ *
+ * Returns true or false if the parser has encountered and error or not.
+ *
+ */
+VALUE hpe_parser_has_error( VALUE self )
+{
+    http_parser *parser;
+    VALUE        rc;
+
+    Data_Get_Struct( self, http_parser, parser );
+
+    if ( http_parser_has_error( parser ) ){
+        return Qtrue;
+    } else {
+        return Qfalse;
+    }
+}
+
+
+/*
+ * call-seq:
+ *   parser.reset -> nil
+ *
+ * Reset the state of the parser to what it was upon initial
+ * instantiation.  This resets the internal state machine and allows it
+ * to be used again.
+ *
+ * Also be aware, that immediately following the +on_message_complete+
+ * callback the Parser is also implicitly reset.
+ *
+ */
+VALUE hpe_parser_reset( VALUE self )
+{
+    http_parser *parser;
+    VALUE        rc;
+
+    Data_Get_Struct( self, http_parser, parser );
+    RESET_PARSER( parser );
+    return Qnil;
+}
+
+/*
+ * call-seq:
+ *   parser.parse_chunk( String ) -> nil
+ *
+ * Parse the given hunk of data invoking the callbacks as appropriate.
+ *
+ * If an error is encountered, an exception is thrown.  If there is an
+ * on_error callback registered, then an exception is NOT thrown, the
+ * on_error callback is called.
+ *
+ */
+VALUE hpe_parser_parse_chunk( VALUE self, VALUE chunk )
+{
+    http_parser *parser;
+    VALUE       str = StringValue( chunk );
+
+    Data_Get_Struct( self, http_parser, parser );
+    http_parser_execute( parser, RSTRING_PTR(str), RSTRING_LEN(str) );
+
+    if ( http_parser_has_error( parser ) ) {
+        if ( 
+    
+
+/*
+ * call-seq:
  *   RequestParser.new
-*
+ *
  * Create a new HTTP Request parser.
  *
  */
@@ -179,13 +314,18 @@ VALUE hpe_request_parser_initialize( VALUE self )
     Data_Get_Struct( self, http_parser, parser );
     http_parser_init( parser, HTTP_REQUEST );
 
+    /* we use the data field in the parser to point to the Ruby Object
+     * that wraps it
+     */
+    parser->data = (void*)self;
+
     return self;
 }
 
 /*
  * call-seq:
  *   ResponseParser.new
-/*
+ *
  * Create a new HTTP Response parser.
  *
  */
@@ -195,6 +335,11 @@ VALUE hpe_response_parser_initialize( VALUE self )
 
     Data_Get_Struct( self, http_parser, parser );
     http_parser_init( parser, HTTP_RESPONSE );
+
+    /* we use the data field in the parser to point to the Ruby Object
+     * that wraps it.
+     */
+    parser->data = (void*)self;
 
     return self;
 }
@@ -232,19 +377,45 @@ void Init_http_parser_ext()
     rb_define_const( mHttp, "IDENTITY" ,rb_str_new2("IDENTITY") );
     rb_define_const( mHttp, "CHUNKED"  ,rb_str_new2("CHUNKED") );
 
-    /* Http::Parser */
+
+    /******************************************************************
+     * Http::Parser 
+    ******************************************************************/
     rb_define_method( cHttpParser, "chunked_encoding?" ,hpe_parser_chunked_encoding , 0 );
     rb_define_method( cHttpParser, "version"           ,hpe_parser_version          , 0 );
     rb_define_method( cHttpParser, "keep_alive?"       ,hpe_parser_keep_alive       , 0 );
     rb_define_method( cHttpParser, "content_length?"   ,hpe_parser_content_length   , 0 );
+    rb_define_method( cHttpParser, "has_error?"        ,hpe_parser_has_error        , 0 );
+    rb_define_method( cHttpParser, "reset"             ,hpe_parser_reset            , 0 );
+    rb_define_method( cHttpParser, "parse_chunk"       ,hpe_parse_chunk             , 1 );
+
+    /* the common callbacks */
+    rb_define_method( cHttpParser, "on_message_begin="    ,hpe_parser_on_message_begin   , 1 );
+    rb_define_method( cHttpParser, "on_header_field="     ,hpe_parser_on_header_field    , 1 );
+    rb_define_method( cHttpParser, "on_header_value="     ,hpe_parser_on_header_value    , 1 );
+    rb_define_method( cHttpParser, "on_headers_complete=" ,hpe_parser_on_headers_complete, 1 );
+    rb_define_method( cHttpParser, "on_body="             ,hpe_parser_on_body            , 1 );
+    rb_define_method( cHttpParser, "on_message_complete=" ,hpe_parser_on_message_complete, 1 );
+    rb_define_method( cHttpParser, "on_error="            ,hpe_parser_on_error           , 2 );
 
 
-    /* Http::RequestParser */
+    /******************************************************************
+     * Http::RequestParser 
+    ******************************************************************/
     rb_define_alloc_func( cHttpRequestParser, hpe_alloc);
     rb_define_method( cHttpRequestParser, "initialize",hpe_request_parser_initialize, 0 );
     rb_define_method( cHttpRequestParser, "method"    ,hpe_parser_method            , 0 );
 
-    /* Http::ResponseParser */
+    /* additional request callbacks */
+    rb_define_method( cHttpParser, "on_path="           ,hpe_parser_on_path          , 1 );
+    rb_define_method( cHttpParser, "on_query_string="   ,hpe_parser_on_query_string  , 1 );
+    rb_define_method( cHttpParser, "on_uri="            ,hpe_parser_on_uri           , 1 );
+    rb_define_method( cHttpParser, "on_fragment="       ,hpe_parser_on_fragment      , 1 );
+
+
+    /******************************************************************
+     * Http::ResponseParser
+     ******************************************************************/
     rb_define_alloc_func( cHttpResponseParser, hpe_alloc);
     rb_define_method( cHttpResponseParser, "initialize"  ,hpe_response_parser_initialize, 0 );
     rb_define_method( cHttpResponseParser, "status_code" ,hpe_parser_status_code        , 0 );

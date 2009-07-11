@@ -30,6 +30,32 @@ module Http
     def initialize
       raise Error, "Do not instantiate Parser.  Instantiate either a RequestParser or a ResponseParser."
     end
+
+    ##
+    # Callbacks, the can either be invoked as a block, or be assigned directly.
+    # 
+    # Take for instance, the +on_header_field+ callback.  It can be assigned
+    # either via a block notation, or assigned to directly as something that
+    # responds to +call+.
+    #
+    #   parser.on_header_field do |field|
+    #   ...
+    #   end
+    #
+    # or
+    #
+    #   parser.on_header_field = lambda { |field| ... }
+    #
+    # or
+    #
+    #   parser.on_header_field = HeaderFieldDoSometing.new # this class responds to +call+
+    #
+    def on_message_begin( &block )    self.on_message_begin = block    ; end
+    def on_header_field( &block )     self.on_header_field = block     ; end
+    def on_header_value( &block )     self.on_header_value = block     ; end
+    def on_headers_complete( &block ) self.on_headers_complete= block  ; end
+    def on_body( &block )             self.on_body = block             ; end
+    def on_message_complete( &block ) self.on_message_complete = block ; end
   end
 end
 
