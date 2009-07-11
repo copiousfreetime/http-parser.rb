@@ -3,9 +3,8 @@
 # All rights reserved.  See LICENSE and/or COPYING for details.
 #++
 
-module HttpParser
-  class Error < StandardError; end
+module Http
 end
 
-require 'http_parser/version'
-require 'http_parser/paths'
+require 'http/parser/version'
+require 'http/parser/paths'
