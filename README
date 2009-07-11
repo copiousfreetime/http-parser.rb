@@ -1,21 +1,40 @@
 == http_parser
 
-* Homepage
-* rubyforge project
-* email
+* Homepage[http://copiousfreetime.rubyforge.org/http-parser]
+* {Rubyforge Project}[http://rubyforge.org/projects/copiousfreetime/]
+* email jeremy at copiousfreetime dot org
+* git clone url git://github.com/copiousfreetime/http-parser.rb.git
+
+== INSTALL
+
+* gem install http-parser
 
 == DESCRIPTION
 
-== FEATURES
+This is a ruby wrapper around the
+{http-parser}[http://github.com/ry/http-parser/tree/master] library.  The
+upstream http-parser library is, in itself, an evolution of Zed Shaw's
+http11_parser that is part {mongrel}[http://mongrel.rubyforge.org/]
 
-== SYNOPSIS
+So this library has come full circle back to ruby again.
 
 == CREDITS
 
+* {Ryah Dahl}[http://github.com/ry]
+* {Zed Shaw}[http://zedshaw.com/]
+
 == LICENSE
 
-Copyright (c)  Jeremy Hinegardner
+Copyright (c) 2009 Jeremy Hinegardner and released under the same terms as Ruby.
+See the top level LICENSE and COPYING files for details.
 
-All rights reserved.
+The following files are the exception, they fall under the auspicies of the 
+ext/http-parser/LICENSE.  That file indicates that that Rhay Dahl's works is
+under the MIT license, and Zed Shaw's work is under the same tersm as Ruby.
 
-See LICENSE and/or COPYING for details.
+* ext/http-parser/LICENSE
+* ext/http-parser/README.md
+* ext/http-parser/http_parser.c
+* ext/http-parser/http_parser.h
+* ext/http-parser/http_parser.rl
+
