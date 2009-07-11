@@ -4,6 +4,12 @@
 #++
 
 module Http
+  #
+  # see ext/http-parser/http-parser_ext.c
+  #
+  class Parser
+    private :initialize
+  end
 end
 
 require 'http/parser/version'
