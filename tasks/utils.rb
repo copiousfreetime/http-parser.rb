@@ -1,4 +1,4 @@
-require 'http_parser/version'
+require 'http/parser_version'
 
 #-------------------------------------------------------------------------------
 # Additions to the Configuration class that are useful
@@ -69,11 +69,11 @@ module Utils
     def announcement
       cfg = Configuration.for("project") 
       { 
-        :subject        => "#{cfg.name} #{HttpParser::VERSION} Released",
-        :title          => "#{cfg.name} version #{HttpParser::VERSION} has been released.",
+        :subject        => "#{cfg.name} #{Http::Parser::VERSION} Released",
+        :title          => "#{cfg.name} version #{Http::Parser::VERSION} has been released.",
         :urls           => "#{cfg.homepage}",
         :description    => "#{cfg.description.rstrip}",
-        :release_notes  => Utils.release_notes_from(cfg.history)[HttpParser::VERSION].rstrip 
+        :release_notes  => Utils.release_notes_from(cfg.history)[Http::Parser::VERSION].rstrip 
       }
     end
   end

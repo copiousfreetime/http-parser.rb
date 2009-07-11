@@ -8,7 +8,7 @@ require 'tasks/utils'
 #-----------------------------------------------------------------------
 Configuration.for('project') {
   name          "http-parser"
-  version       HttpParser::Version.to_s 
+  version       Http::Parser::VERSION
   author        "Jeremy Hinegardner"
   email         "jeremy@copiousfreetime.org"
   homepage      "http://copiousfreetime.rubyforge.org/http-parser"

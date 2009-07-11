@@ -2,10 +2,13 @@ pkg/*
 doc/*
 coverage/*
 tags
-lib/http_parser/1.8/http_parser_ext.so
-lib/http_parser/1.9/http_parser_ext.so
-ext/http_parser/Makefile
-ext/http_parser/rbconfig.rb
+lib/http/parser/1.8/http_parser_ext.so
+lib/http/parser/1.9/http_parser_ext.so
+ext/http-parser/Makefile
+ext/http-parser/rbconfig.rb
 tmp/*
+*.o
+*.bundle
+*.so
 *~
 *.swp

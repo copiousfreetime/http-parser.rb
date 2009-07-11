@@ -9,6 +9,7 @@
 #-------------------------------------------------------------------------------
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__),"lib"))
 $:.unshift File.expand_path(File.dirname(__FILE__))
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__),"ext"))
 
 
 #-------------------------------------------------------------------------------
@@ -24,10 +25,10 @@ require 'rake/clean'
 # Main configuration for the project, these overwrite the items that are in
 # tasks/config.rb
 #-------------------------------------------------------------------------------
-require 'http_parser'
+require 'http/parser_version'
 Configuration.for("project") {
   name      "http_parser"
-  version   HttpParser::VERSION
+  version   Http::Parser::VERSION
   author    "Jeremy Hinegardner"
   email     "jeremy@copiousfreetime.org"
   homepage  "http://http_parser.rubyforge.org/"

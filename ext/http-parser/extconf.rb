@@ -1,6 +1,6 @@
 require 'mkmf'
 require 'rbconfig'
 
-subdir = RUBY_VERSION.sub(/\.\d$/,'')
 $CFLAGS += " -O3"
-create_makefile("http_parser/#{subdir}/http_parser_ext")
+subdir = RUBY_VERSION.sub(/\.\d$/,'')
+create_makefile("http/parser/#{subdir}/http_parser_ext")

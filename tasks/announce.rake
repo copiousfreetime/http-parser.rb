@@ -17,13 +17,13 @@ namespace :announce do
       mail.puts
       mail.puts info[:title]
       mail.puts
-      mail.puts "  gem install #{HttpParser::GEM_SPEC.name}"
+      mail.puts "  gem install #{Http::Parser::GEM_SPEC.name}"
       mail.puts
       mail.puts info[:urls]
       mail.puts 
       mail.puts info[:description]
       mail.puts 
-      mail.puts "{{ Release notes for Version #{HttpParser::VERSION} }}"
+      mail.puts "{{ Release notes for Version #{Http::Parser::VERSION} }}"
       mail.puts 
       mail.puts info[:release_notes]
       mail.puts

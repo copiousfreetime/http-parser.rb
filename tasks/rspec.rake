@@ -11,10 +11,12 @@ if spec_config = Configuration.for_if_exist?("test") then
       task :default => :spec
 
       require 'spec/rake/spectask'
+      root_dir = File.expand_path( File.join( File.dirname( __FILE__), ".."))
+      lib_dir = File.join( root_dir, "lib" )
+      ext_dir = File.join( root_dir, "ext" )
       Spec::Rake::SpecTask.new do |r| 
         r.ruby_opts   = spec_config.ruby_opts
-        r.libs        = [ HttpParser.lib_path, 
-                          HttpParser.root_dir ]
+        r.libs        = [ lib_dir, ext_dir, root_dir ]
         r.spec_files  = spec_config.files 
         r.spec_opts   = spec_config.options
 
@@ -24,6 +26,8 @@ if spec_config = Configuration.for_if_exist?("test") then
           r.rcov_opts = rcov_config.rcov_opts
         end
       end
+
+      task :spec => "ext:build"
     end
   end
 end

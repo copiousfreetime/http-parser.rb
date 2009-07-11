@@ -1,11 +1,11 @@
 require 'rubygems'
-require 'http_parser/version'
+require 'http/parser_version'
 require 'tasks/config'
 
-HttpParser::GEM_SPEC = Gem::Specification.new do |spec|
+Http::Parser::GEM_SPEC = Gem::Specification.new do |spec|
   proj = Configuration.for('project')
   spec.name         = proj.name
-  spec.version      = HttpParser::VERSION
+  spec.version      = Http::Parser::VERSION
   
   spec.author       = proj.author
   spec.email        = proj.email
@@ -20,9 +20,7 @@ HttpParser::GEM_SPEC = Gem::Specification.new do |spec|
   spec.executables  = pkg.files.bin.collect { |b| File.basename(b) }
 
   # add dependencies here
-  # spec.add_dependency("rake", ">= 0.8.1")
-  spec.add_dependency("configuration", ">= 0.0.5")
-  
+  spec.add_development_dependency("configuration", "~> 0.0.5")
   spec.add_development_dependency( "rake", "~> 0.8.3")
 
   if ext_conf = Configuration.for_if_exist?("extension") then
