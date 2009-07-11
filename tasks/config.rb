@@ -7,15 +7,15 @@ require 'tasks/utils'
 # General project configuration
 #-----------------------------------------------------------------------
 Configuration.for('project') {
-  name          "http_parser"
+  name          "http-parser"
   version       HttpParser::Version.to_s 
   author        "Jeremy Hinegardner"
   email         "jeremy@copiousfreetime.org"
-  homepage      "http://http_parser.rubyforge.org/"
+  homepage      "http://copiousfreetime.rubyforge.org/http-parser"
   description   Utils.section_of("README", "description")
   summary       description.split(".").first
   history       "HISTORY"
-  license       FileList["LICENSE", "COPYING"]
+  license       FileList["LICENSE"]
   readme        "README"
 }
 
@@ -27,13 +27,13 @@ Configuration.for('packaging') {
   proj_conf = Configuration.for('project')
   files {
     bin       FileList["bin/*"]
-    ext       FileList["ext/*.{c,h,rb}"]
+    ext       FileList["ext/**/*.{c,h,rb,rl}"]
     lib       FileList["lib/**/*.rb"]
     test      FileList["spec/**/*.rb", "test/**/*.rb"]
     data      FileList["data/**/*"]
     tasks     FileList["tasks/**/*.r{ake,b}"]
     rdoc      FileList[proj_conf.readme, proj_conf.history,
-                       proj_conf.license] + lib
+                       proj_conf.license] + lib + FileList["ext/http-parser/http-parser_ext*.c"]
     all       bin + ext + lib + test + data + rdoc + tasks 
   }
 
@@ -91,17 +91,17 @@ Configuration.for('rdoc') {
 #-----------------------------------------------------------------------
 Configuration.for('extension') {
   configs   Configuration.for('packaging').files.ext.find_all { |x| 
-                %w[ mkrf_conf.rb extconf.rb ].include?( File.basename(x) ) 
+                %w[ extconf.rb ].include?( File.basename(x) ) 
             }
 }
 #-----------------------------------------------------------------------
 # Rubyforge 
 #-----------------------------------------------------------------------
 Configuration.for('rubyforge') {
-  project       "FIXME: rubyforge project"
-  user          "FIXME: username"
+  project       "copiousfreetime"
+  user          "jjh"
   host          "rubyforge.org"
-  rdoc_location "#{user}@#{host}:/var/www/gforge-projects/#{project}"
+  rdoc_location "#{user}@#{host}:/var/www/gforge-projects/#{project}/http-parser"
 }
 
 
