@@ -2,11 +2,18 @@
  * Copyright (c) 2009 Jeremy Hinegardner
  * All rights reserved.  See LICENSE and/or COPYING for details.
  *
- * vim: shiftwidth=4
- * vim: textwidth-72
+ * vim: shiftwidth=4 tw=72
  */
 
-#include "http-parser_ext.h"
+/* #include "http-parser_ext.h" */
+
+#include "ruby.h"
+#include "http_parser.h"
+#include <string.h>
+#include <stdio.h>
+
+#define true 1
+#define false 0
 
 /* class defined here */
 VALUE mHttp;                /* module Http */
@@ -15,17 +22,66 @@ VALUE cHttpRequestParser;   /* class Http::RequestParser */
 VALUE cHttpResponseParser;  /* class Http::ResponseParser */
 VALUE eHttpParserError;     /* class Http::Parser::Error  */
 
+/***
+ * Callback Error handling:
+ *
+ * Any time a callback is invoked, if it raises and exception then the
+ * parsing will stop and either an exception will be raised where the
+ * +parse_chunk+ method is called, or the +on_error+ callback will be
+ * called.
+ *
+ * Since we are registering ruby methods as the callbacks to C methods,
+ * we need to wrap the ruby method and capture the exception and store
+ * it away.  We do this by using rb_protect and then getting hte
+ * exception by accessing $!.
+ *
+ * The exception caught is then stored in the @_exception instance
+ * variable in the Parser class which is passed to the +on_error+
+ * callback.
+ *
+ */
+
+/* wrapper struct around the information need to call a ruby method 
+ * and have it be protected with rb_protect.  This is used by
+ * hpe_funcall2 which is invoked by rb_protect
+ */
+typedef struct hpe_protected {
+    VALUE   instance;
+    ID      method;
+    int     argc;
+    VALUE  *argv;
+} hpe_protected_t;
+
+#define ERROR_INFO_MESSAGE()  ( rb_obj_as_string( rb_gv_get("$!") ) )
+
+/**
+ * invoke a ruby function, this is to be used by rb_protect
+ */
+VALUE hpe_wrap_funcall2( VALUE arg )
+{
+    hpe_protected_t *protected = (hpe_protected_t*) arg;
+    return rb_funcall2( protected->instance, protected->method,
+                        protected->argc, protected->argv );
+}
+
+
 /* generator for callback setter */
 #define HPE_CALLBACK_SETTER(FOR,CB_TYPE)                              \
 VALUE hpe_parser_##FOR( VALUE self, VALUE callable )                  \
 {                                                                     \
     http_parser *parser;                                              \
+    VALUE rb_parser;                                                  \
+                                                                      \
     Data_Get_Struct( self, http_parser, parser );                     \
+    rb_parser = (VALUE)parser->data;                                  \
+                                                                      \
     if ( Qnil == callable ) {                                         \
         parser->FOR = NULL;                                           \
     } else {                                                          \
+        rb_iv_set( rb_parser, "@" #FOR "_callback", callable );       \
         parser->FOR = (http_##CB_TYPE)hpe_##FOR##_##CB_TYPE;          \
     }                                                                 \
+    return callable;                                                  \
 }
 
 
@@ -35,15 +91,26 @@ int hpe_##FOR##_cb( http_parser *parser )                              \
 {                                                                      \
     VALUE rb_parser = (VALUE)parser->data;                             \
     VALUE callable  = rb_iv_get( rb_parser, "@" #FOR "_callback" );    \
+    int had_error   = false;                                           \
                                                                        \
     if ( Qnil != callable ) {                                          \
-        VALUE result = rb_funcall(callable, rb_intern("call"),         \
-                                  1, rb_parser );                      \
-        if ( ( Qfalse != result ) && ( Qnil != result ) ) {            \
-            return true;                                               \
+        hpe_protected_t protected;                                     \
+        VALUE           result;                                        \
+        VALUE           cb_exception = Qnil;                           \
+                                                                       \
+        protected.instance = (VALUE)callable;                          \
+        protected.method   = rb_intern("call");                        \
+        protected.argc     = 1;                                        \
+        protected.argv     = &rb_parser;                               \
+                                                                       \
+        result = rb_protect( hpe_wrap_funcall2, (VALUE)&protected,     \
+                             &had_error);                              \
+        if (had_error) {                                               \
+            cb_exception = rb_gv_get("$!");                            \
         }                                                              \
+        rb_iv_set( rb_parser, "@callback_exception", cb_exception);    \
     }                                                                  \
-    return false;                                                      \
+    return had_error;                                                  \
 };                                                                     \
 HPE_CALLBACK_SETTER(FOR,cb)
 
@@ -54,16 +121,31 @@ int hpe_##FOR##_data_cb( http_parser *parser,                          \
 {                                                                      \
     VALUE rb_parser = (VALUE)parser->data;                             \
     VALUE callable  = rb_iv_get( rb_parser, "@" #FOR "_callback" );    \
+    int had_error   = false;                                           \
                                                                        \
     if ( Qnil != callable ) {                                          \
-        VALUE str    = rb_str_new( at, length );                       \
-        VALUE result = rb_funcall(callable, rb_intern("call"),         \
-                                  2, rb_parser, str );                 \
-        if ( ( Qfalse != result ) && ( Qnil != result ) ) {            \
-            return true;                                               \
+        hpe_protected_t protected;                                     \
+        VALUE           result;                                        \
+        VALUE           cb_exception = Qnil;                           \
+        VALUE           args[2];                                       \
+        VALUE           str = rb_str_new( at, length );                \
+                                                                       \
+        args[0] = rb_parser;                                           \
+        args[1] = str;                                                 \
+                                                                       \
+        protected.instance = (VALUE)callable;                          \
+        protected.method   = rb_intern("call");                        \
+        protected.argc     = 2;                                        \
+        protected.argv     = args;                                     \
+                                                                       \
+        result = rb_protect( hpe_wrap_funcall2, (VALUE)&protected,     \
+                             &had_error);                              \
+        if (had_error) {                                               \
+            cb_exception = rb_gv_get("$!");                            \
         }                                                              \
+        rb_iv_set( rb_parser, "@callback_exception", cb_exception);    \
     }                                                                  \
-    return false;                                                      \
+    return had_error;                                                  \
 };                                                                     \
 HPE_CALLBACK_SETTER(FOR,data_cb)
 
@@ -95,7 +177,7 @@ void hpe_free( http_parser* parser )
  */
 VALUE hpe_alloc( VALUE klass )
 {
-    http_parser *parser = xmalloc( sizeof( http_parser ));
+    http_parser *parser = xcalloc(1, sizeof( http_parser ));
     VALUE           obj;
 
     obj = Data_Wrap_Struct( klass, NULL, hpe_free, parser );
@@ -201,10 +283,10 @@ VALUE hpe_parser_version( VALUE self )
 VALUE hpe_parser_keep_alive( VALUE self )
 {
     http_parser *parser;
+    int          ka;
 
     Data_Get_Struct( self, http_parser, parser );
-
-    if ( http_parser_should_keep_alive( parser ) ) {
+    if ( http_parser_should_keep_alive( parser ) )  {
         return Qtrue;
     } else {
         return Qfalse;
@@ -230,28 +312,6 @@ VALUE hpe_parser_content_length( VALUE self )
     rc = UULL2NUM( content_length );
    
     return rc;
-}
-
-
-/*
- * call-seq:
- *   parser.has_error? -> true or false
- *
- * Returns true or false if the parser has encountered and error or not.
- *
- */
-VALUE hpe_parser_has_error( VALUE self )
-{
-    http_parser *parser;
-    VALUE        rc;
-
-    Data_Get_Struct( self, http_parser, parser );
-
-    if ( http_parser_has_error( parser ) ){
-        return Qtrue;
-    } else {
-        return Qfalse;
-    }
 }
 
 
@@ -283,22 +343,40 @@ VALUE hpe_parser_reset( VALUE self )
  *
  * Parse the given hunk of data invoking the callbacks as appropriate.
  *
- * If an error is encountered, an exception is thrown.  If there is an
- * on_error callback registered, then an exception is NOT thrown, the
- * on_error callback is called.
+ * If an error is encountered, an exception is thrown.  This could be
+ * one of two things:
+ *
+ * 1) The error happened in the callback, in that case that exception is
+ *    reraised
+ * 2) Internal error in the parser, in this case an new excpetion is
+ *    raised
+ *
+ * If there is an on_error callback, then it is invoked. In both cases
+ * the parser and the input chunk are passed to the +on_error+ callback.
+ * The receiver of the callback can interrogate the parser and see if
+ * there was an error from some other callback.
  *
  */
 VALUE hpe_parser_parse_chunk( VALUE self, VALUE chunk )
 {
     http_parser *parser;
     VALUE       str = StringValue( chunk );
+    char*       chunk_p = RSTRING_PTR( str );
 
     Data_Get_Struct( self, http_parser, parser );
-    http_parser_execute( parser, RSTRING_PTR(str), RSTRING_LEN(str) );
+    http_parser_execute( parser, chunk_p, RSTRING_LEN(str) );
 
     if ( http_parser_has_error( parser ) ) {
-        if ( 
-    
+        VALUE callback = rb_iv_get( self, "@on_error_callback" );
+        if ( Qnil == callback ) {
+            rb_raise(eHttpParserError, "Failure during parsing of chunk [%s]",
+                    chunk_p);
+        } else {
+            rb_funcall( callback, rb_intern("call"), 2, self, chunk );
+        } 
+    }
+    return Qnil;
+}
 
 /*
  * call-seq:
@@ -314,10 +392,16 @@ VALUE hpe_request_parser_initialize( VALUE self )
     Data_Get_Struct( self, http_parser, parser );
     http_parser_init( parser, HTTP_REQUEST );
 
+    rb_call_super( 0, NULL );
+
     /* we use the data field in the parser to point to the Ruby Object
      * that wraps it
      */
     parser->data = (void*)self;
+    rb_iv_set( self, "@on_path_callback", Qnil);
+    rb_iv_set( self, "@on_uri_callback", Qnil);
+    rb_iv_set( self, "@on_fragment_callback", Qnil);
+    rb_iv_set( self, "@on_query_string_callback", Qnil);
 
     return self;
 }
@@ -336,6 +420,8 @@ VALUE hpe_response_parser_initialize( VALUE self )
     Data_Get_Struct( self, http_parser, parser );
     http_parser_init( parser, HTTP_RESPONSE );
 
+    rb_call_super( 0, NULL );
+
     /* we use the data field in the parser to point to the Ruby Object
      * that wraps it.
      */
@@ -350,11 +436,11 @@ VALUE hpe_response_parser_initialize( VALUE self )
  */
 void Init_http_parser_ext()
 {
-    VALUE mHttp               = rb_define_module( "Http" );
-    VALUE cHttpParser         = rb_define_class_under( mHttp, "Parser", rb_cObject);
-    VALUE cHttpRequestParser  = rb_define_class_under( mHttp, "RequestParser", cHttpParser );
-    VALUE cHttpResponseParser = rb_define_class_under( mHttp, "ResponseParser", cHttpParser );
-    VALUE eHttpParserError    = rb_define_class_under( cHttpParser, "Error", rb_eStandardError );
+    mHttp               = rb_define_module( "Http" );
+    cHttpParser         = rb_define_class_under( mHttp, "Parser", rb_cObject);
+    cHttpRequestParser  = rb_define_class_under( mHttp, "RequestParser", cHttpParser );
+    cHttpResponseParser = rb_define_class_under( mHttp, "ResponseParser", cHttpParser );
+    eHttpParserError    = rb_define_class_under( cHttpParser, "Error", rb_eStandardError );
 
     /* Http:: Constants */
     /* methods */
@@ -385,9 +471,8 @@ void Init_http_parser_ext()
     rb_define_method( cHttpParser, "version"           ,hpe_parser_version          , 0 );
     rb_define_method( cHttpParser, "keep_alive?"       ,hpe_parser_keep_alive       , 0 );
     rb_define_method( cHttpParser, "content_length?"   ,hpe_parser_content_length   , 0 );
-    rb_define_method( cHttpParser, "has_error?"        ,hpe_parser_has_error        , 0 );
     rb_define_method( cHttpParser, "reset"             ,hpe_parser_reset            , 0 );
-    rb_define_method( cHttpParser, "parse_chunk"       ,hpe_parse_chunk             , 1 );
+    rb_define_method( cHttpParser, "parse_chunk"       ,hpe_parser_parse_chunk      , 1 );
 
     /* the common callbacks */
     rb_define_method( cHttpParser, "on_message_begin="    ,hpe_parser_on_message_begin   , 1 );
@@ -396,7 +481,6 @@ void Init_http_parser_ext()
     rb_define_method( cHttpParser, "on_headers_complete=" ,hpe_parser_on_headers_complete, 1 );
     rb_define_method( cHttpParser, "on_body="             ,hpe_parser_on_body            , 1 );
     rb_define_method( cHttpParser, "on_message_complete=" ,hpe_parser_on_message_complete, 1 );
-    rb_define_method( cHttpParser, "on_error="            ,hpe_parser_on_error           , 2 );
 
 
     /******************************************************************

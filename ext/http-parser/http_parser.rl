@@ -423,10 +423,13 @@ http_parser_init (http_parser *parser, enum http_parser_type type)
   parser->type = type;
   parser->error = 0;
 
+  parser->data = NULL;
+
   parser->on_message_begin = NULL;
   parser->on_path = NULL;
   parser->on_query_string = NULL;
   parser->on_uri = NULL;
+  parser->on_fragment = NULL;
   parser->on_header_field = NULL;
   parser->on_header_value = NULL;
   parser->on_headers_complete = NULL;

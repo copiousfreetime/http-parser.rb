@@ -139,10 +139,13 @@ http_parser_init (http_parser *parser, enum http_parser_type type)
   parser->type = type;
   parser->error = 0;
 
+  parser->data = NULL;
+
   parser->on_message_begin = NULL;
   parser->on_path = NULL;
   parser->on_query_string = NULL;
   parser->on_uri = NULL;
+  parser->on_fragment = NULL;
   parser->on_header_field = NULL;
   parser->on_header_value = NULL;
   parser->on_headers_complete = NULL;
@@ -181,7 +184,7 @@ http_parser_execute (http_parser *parser, const char *buffer, size_t len)
   if (parser->uri_mark)            parser->uri_mark            = buffer;
 
   
-#line 185 "http_parser.c"
+#line 188 "http_parser.c"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -488,7 +491,7 @@ st267:
 	if ( ++p == pe )
 		goto _test_eof267;
 case 267:
-#line 492 "http_parser.c"
+#line 495 "http_parser.c"
 	goto st0;
 st0:
 cs = 0;
@@ -519,7 +522,7 @@ st3:
 	if ( ++p == pe )
 		goto _test_eof3;
 case 3:
-#line 523 "http_parser.c"
+#line 526 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto st4;
 		case 48: goto tr1;
@@ -592,7 +595,7 @@ st268:
 	if ( ++p == pe )
 		goto _test_eof268;
 case 268:
-#line 596 "http_parser.c"
+#line 599 "http_parser.c"
 	goto st0;
 st7:
 	if ( ++p == pe )
@@ -640,7 +643,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 644 "http_parser.c"
+#line 647 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto st10;
 		case 59: goto st14;
@@ -687,7 +690,7 @@ st12:
 	if ( ++p == pe )
 		goto _test_eof12;
 case 12:
-#line 691 "http_parser.c"
+#line 694 "http_parser.c"
 	if ( (*p) == 13 )
 		goto st13;
 	goto st0;
@@ -917,7 +920,7 @@ st269:
 	if ( ++p == pe )
 		goto _test_eof269;
 case 269:
-#line 921 "http_parser.c"
+#line 924 "http_parser.c"
 	switch( (*p) ) {
 		case 67: goto tr311;
 		case 68: goto tr312;
@@ -947,7 +950,7 @@ st20:
 	if ( ++p == pe )
 		goto _test_eof20;
 case 20:
-#line 951 "http_parser.c"
+#line 954 "http_parser.c"
 	if ( (*p) == 79 )
 		goto st21;
 	goto st0;
@@ -1032,7 +1035,7 @@ st24:
 	if ( ++p == pe )
 		goto _test_eof24;
 case 24:
-#line 1036 "http_parser.c"
+#line 1039 "http_parser.c"
 	switch( (*p) ) {
 		case 42: goto tr25;
 		case 43: goto tr26;
@@ -1059,7 +1062,7 @@ st25:
 	if ( ++p == pe )
 		goto _test_eof25;
 case 25:
-#line 1063 "http_parser.c"
+#line 1066 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr29;
 		case 35: goto tr30;
@@ -1181,7 +1184,7 @@ st26:
 	if ( ++p == pe )
 		goto _test_eof26;
 case 26:
-#line 1185 "http_parser.c"
+#line 1188 "http_parser.c"
 	if ( (*p) == 72 )
 		goto st27;
 	goto st0;
@@ -1231,7 +1234,7 @@ st32:
 	if ( ++p == pe )
 		goto _test_eof32;
 case 32:
-#line 1235 "http_parser.c"
+#line 1238 "http_parser.c"
 	if ( (*p) == 46 )
 		goto st33;
 	goto st0;
@@ -1253,7 +1256,7 @@ st34:
 	if ( ++p == pe )
 		goto _test_eof34;
 case 34:
-#line 1257 "http_parser.c"
+#line 1260 "http_parser.c"
 	if ( (*p) == 13 )
 		goto st35;
 	goto st0;
@@ -1332,7 +1335,7 @@ st35:
 	if ( ++p == pe )
 		goto _test_eof35;
 case 35:
-#line 1336 "http_parser.c"
+#line 1339 "http_parser.c"
 	if ( (*p) == 10 )
 		goto st36;
 	goto st0;
@@ -1386,7 +1389,7 @@ st38:
 	if ( ++p == pe )
 		goto _test_eof38;
 case 38:
-#line 1390 "http_parser.c"
+#line 1393 "http_parser.c"
 	switch( (*p) ) {
 		case 33: goto st38;
 		case 58: goto tr47;
@@ -1427,7 +1430,7 @@ st39:
 	if ( ++p == pe )
 		goto _test_eof39;
 case 39:
-#line 1431 "http_parser.c"
+#line 1434 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr49;
 		case 32: goto st39;
@@ -1444,7 +1447,7 @@ st40:
 	if ( ++p == pe )
 		goto _test_eof40;
 case 40:
-#line 1448 "http_parser.c"
+#line 1451 "http_parser.c"
 	if ( (*p) == 13 )
 		goto tr52;
 	goto st40;
@@ -1459,7 +1462,7 @@ st41:
 	if ( ++p == pe )
 		goto _test_eof41;
 case 41:
-#line 1463 "http_parser.c"
+#line 1466 "http_parser.c"
 	switch( (*p) ) {
 		case 33: goto st38;
 		case 58: goto tr47;
@@ -1772,7 +1775,7 @@ st51:
 	if ( ++p == pe )
 		goto _test_eof51;
 case 51:
-#line 1776 "http_parser.c"
+#line 1779 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr49;
 		case 32: goto st51;
@@ -1793,7 +1796,7 @@ st52:
 	if ( ++p == pe )
 		goto _test_eof52;
 case 52:
-#line 1797 "http_parser.c"
+#line 1800 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr52;
 		case 76: goto st53;
@@ -1848,7 +1851,7 @@ st57:
 	if ( ++p == pe )
 		goto _test_eof57;
 case 57:
-#line 1852 "http_parser.c"
+#line 1855 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr52;
 		case 69: goto st58;
@@ -2282,7 +2285,7 @@ st78:
 	if ( ++p == pe )
 		goto _test_eof78;
 case 78:
-#line 2286 "http_parser.c"
+#line 2289 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr49;
 		case 32: goto st78;
@@ -2321,7 +2324,7 @@ st79:
 	if ( ++p == pe )
 		goto _test_eof79;
 case 79:
-#line 2325 "http_parser.c"
+#line 2328 "http_parser.c"
 	if ( (*p) == 13 )
 		goto tr52;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -2338,7 +2341,7 @@ st80:
 	if ( ++p == pe )
 		goto _test_eof80;
 case 80:
-#line 2342 "http_parser.c"
+#line 2345 "http_parser.c"
 	switch( (*p) ) {
 		case 33: goto st38;
 		case 58: goto tr47;
@@ -2858,7 +2861,7 @@ st97:
 	if ( ++p == pe )
 		goto _test_eof97;
 case 97:
-#line 2862 "http_parser.c"
+#line 2865 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr49;
 		case 32: goto st97;
@@ -2876,7 +2879,7 @@ st98:
 	if ( ++p == pe )
 		goto _test_eof98;
 case 98:
-#line 2880 "http_parser.c"
+#line 2883 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr52;
 		case 100: goto st99;
@@ -3030,7 +3033,7 @@ st106:
 	if ( ++p == pe )
 		goto _test_eof106;
 case 106:
-#line 3034 "http_parser.c"
+#line 3037 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr124;
 		case 37: goto tr125;
@@ -3055,7 +3058,7 @@ st107:
 	if ( ++p == pe )
 		goto _test_eof107;
 case 107:
-#line 3059 "http_parser.c"
+#line 3062 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr127;
 		case 37: goto st108;
@@ -3080,7 +3083,7 @@ st108:
 	if ( ++p == pe )
 		goto _test_eof108;
 case 108:
-#line 3084 "http_parser.c"
+#line 3087 "http_parser.c"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st109;
@@ -3114,7 +3117,7 @@ st110:
 	if ( ++p == pe )
 		goto _test_eof110;
 case 110:
-#line 3118 "http_parser.c"
+#line 3121 "http_parser.c"
 	switch( (*p) ) {
 		case 43: goto st110;
 		case 58: goto st111;
@@ -3142,7 +3145,7 @@ st111:
 	if ( ++p == pe )
 		goto _test_eof111;
 case 111:
-#line 3146 "http_parser.c"
+#line 3149 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr29;
 		case 34: goto st0;
@@ -3197,7 +3200,7 @@ st114:
 	if ( ++p == pe )
 		goto _test_eof114;
 case 114:
-#line 3201 "http_parser.c"
+#line 3204 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr135;
 		case 34: goto st0;
@@ -3253,7 +3256,7 @@ st117:
 	if ( ++p == pe )
 		goto _test_eof117;
 case 117:
-#line 3257 "http_parser.c"
+#line 3260 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr141;
 		case 34: goto st0;
@@ -3277,7 +3280,7 @@ st118:
 	if ( ++p == pe )
 		goto _test_eof118;
 case 118:
-#line 3281 "http_parser.c"
+#line 3284 "http_parser.c"
 	switch( (*p) ) {
 		case 32: goto tr145;
 		case 34: goto st0;
@@ -3301,7 +3304,7 @@ st119:
 	if ( ++p == pe )
 		goto _test_eof119;
 case 119:
-#line 3305 "http_parser.c"
+#line 3308 "http_parser.c"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st120;
@@ -3340,7 +3343,7 @@ st121:
 	if ( ++p == pe )
 		goto _test_eof121;
 case 121:
-#line 3344 "http_parser.c"
+#line 3347 "http_parser.c"
 	if ( (*p) == 69 )
 		goto st122;
 	goto st0;
@@ -3395,7 +3398,7 @@ st127:
 	if ( ++p == pe )
 		goto _test_eof127;
 case 127:
-#line 3399 "http_parser.c"
+#line 3402 "http_parser.c"
 	if ( (*p) == 69 )
 		goto st128;
 	goto st0;
@@ -3429,7 +3432,7 @@ st130:
 	if ( ++p == pe )
 		goto _test_eof130;
 case 130:
-#line 3433 "http_parser.c"
+#line 3436 "http_parser.c"
 	if ( (*p) == 69 )
 		goto st131;
 	goto st0;
@@ -3470,7 +3473,7 @@ st134:
 	if ( ++p == pe )
 		goto _test_eof134;
 case 134:
-#line 3474 "http_parser.c"
+#line 3477 "http_parser.c"
 	if ( (*p) == 79 )
 		goto st135;
 	goto st0;
@@ -3511,7 +3514,7 @@ st138:
 	if ( ++p == pe )
 		goto _test_eof138;
 case 138:
-#line 3515 "http_parser.c"
+#line 3518 "http_parser.c"
 	switch( (*p) ) {
 		case 75: goto st139;
 		case 79: goto st143;
@@ -3582,7 +3585,7 @@ st146:
 	if ( ++p == pe )
 		goto _test_eof146;
 case 146:
-#line 3586 "http_parser.c"
+#line 3589 "http_parser.c"
 	if ( (*p) == 80 )
 		goto st147;
 	goto st0;
@@ -3644,7 +3647,7 @@ st153:
 	if ( ++p == pe )
 		goto _test_eof153;
 case 153:
-#line 3648 "http_parser.c"
+#line 3651 "http_parser.c"
 	switch( (*p) ) {
 		case 79: goto st154;
 		case 82: goto st157;
@@ -3788,7 +3791,7 @@ st171:
 	if ( ++p == pe )
 		goto _test_eof171;
 case 171:
-#line 3792 "http_parser.c"
+#line 3795 "http_parser.c"
 	if ( (*p) == 82 )
 		goto st172;
 	goto st0;
@@ -3836,7 +3839,7 @@ st176:
 	if ( ++p == pe )
 		goto _test_eof176;
 case 176:
-#line 3840 "http_parser.c"
+#line 3843 "http_parser.c"
 	if ( (*p) == 78 )
 		goto st177;
 	goto st0;
@@ -3914,7 +3917,7 @@ st270:
 	if ( ++p == pe )
 		goto _test_eof270;
 case 270:
-#line 3918 "http_parser.c"
+#line 3921 "http_parser.c"
 	if ( (*p) == 72 )
 		goto tr321;
 	goto st0;
@@ -3934,7 +3937,7 @@ st182:
 	if ( ++p == pe )
 		goto _test_eof182;
 case 182:
-#line 3938 "http_parser.c"
+#line 3941 "http_parser.c"
 	if ( (*p) == 84 )
 		goto st183;
 	goto st0;
@@ -3977,7 +3980,7 @@ st187:
 	if ( ++p == pe )
 		goto _test_eof187;
 case 187:
-#line 3981 "http_parser.c"
+#line 3984 "http_parser.c"
 	if ( (*p) == 46 )
 		goto st188;
 	goto st0;
@@ -3999,7 +4002,7 @@ st189:
 	if ( ++p == pe )
 		goto _test_eof189;
 case 189:
-#line 4003 "http_parser.c"
+#line 4006 "http_parser.c"
 	if ( (*p) == 32 )
 		goto st190;
 	goto st0;
@@ -4021,7 +4024,7 @@ st191:
 	if ( ++p == pe )
 		goto _test_eof191;
 case 191:
-#line 4025 "http_parser.c"
+#line 4028 "http_parser.c"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr223;
 	goto st0;
@@ -4036,7 +4039,7 @@ st192:
 	if ( ++p == pe )
 		goto _test_eof192;
 case 192:
-#line 4040 "http_parser.c"
+#line 4043 "http_parser.c"
 	if ( 48 <= (*p) && (*p) <= 57 )
 		goto tr224;
 	goto st0;
@@ -4051,7 +4054,7 @@ st193:
 	if ( ++p == pe )
 		goto _test_eof193;
 case 193:
-#line 4055 "http_parser.c"
+#line 4058 "http_parser.c"
 	if ( (*p) == 32 )
 		goto st194;
 	goto st0;
@@ -4155,7 +4158,7 @@ st196:
 	if ( ++p == pe )
 		goto _test_eof196;
 case 196:
-#line 4159 "http_parser.c"
+#line 4162 "http_parser.c"
 	if ( (*p) == 10 )
 		goto st197;
 	goto st0;
@@ -4209,7 +4212,7 @@ st199:
 	if ( ++p == pe )
 		goto _test_eof199;
 case 199:
-#line 4213 "http_parser.c"
+#line 4216 "http_parser.c"
 	switch( (*p) ) {
 		case 33: goto st199;
 		case 58: goto tr235;
@@ -4250,7 +4253,7 @@ st200:
 	if ( ++p == pe )
 		goto _test_eof200;
 case 200:
-#line 4254 "http_parser.c"
+#line 4257 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr237;
 		case 32: goto st200;
@@ -4267,7 +4270,7 @@ st201:
 	if ( ++p == pe )
 		goto _test_eof201;
 case 201:
-#line 4271 "http_parser.c"
+#line 4274 "http_parser.c"
 	if ( (*p) == 13 )
 		goto tr240;
 	goto st201;
@@ -4282,7 +4285,7 @@ st202:
 	if ( ++p == pe )
 		goto _test_eof202;
 case 202:
-#line 4286 "http_parser.c"
+#line 4289 "http_parser.c"
 	switch( (*p) ) {
 		case 33: goto st199;
 		case 58: goto tr235;
@@ -4595,7 +4598,7 @@ st212:
 	if ( ++p == pe )
 		goto _test_eof212;
 case 212:
-#line 4599 "http_parser.c"
+#line 4602 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr237;
 		case 32: goto st212;
@@ -4616,7 +4619,7 @@ st213:
 	if ( ++p == pe )
 		goto _test_eof213;
 case 213:
-#line 4620 "http_parser.c"
+#line 4623 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr240;
 		case 76: goto st214;
@@ -4671,7 +4674,7 @@ st218:
 	if ( ++p == pe )
 		goto _test_eof218;
 case 218:
-#line 4675 "http_parser.c"
+#line 4678 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr240;
 		case 69: goto st219;
@@ -5105,7 +5108,7 @@ st239:
 	if ( ++p == pe )
 		goto _test_eof239;
 case 239:
-#line 5109 "http_parser.c"
+#line 5112 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr237;
 		case 32: goto st239;
@@ -5144,7 +5147,7 @@ st240:
 	if ( ++p == pe )
 		goto _test_eof240;
 case 240:
-#line 5148 "http_parser.c"
+#line 5151 "http_parser.c"
 	if ( (*p) == 13 )
 		goto tr240;
 	if ( 48 <= (*p) && (*p) <= 57 )
@@ -5161,7 +5164,7 @@ st241:
 	if ( ++p == pe )
 		goto _test_eof241;
 case 241:
-#line 5165 "http_parser.c"
+#line 5168 "http_parser.c"
 	switch( (*p) ) {
 		case 33: goto st199;
 		case 58: goto tr235;
@@ -5681,7 +5684,7 @@ st258:
 	if ( ++p == pe )
 		goto _test_eof258;
 case 258:
-#line 5685 "http_parser.c"
+#line 5688 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr237;
 		case 32: goto st258;
@@ -5699,7 +5702,7 @@ st259:
 	if ( ++p == pe )
 		goto _test_eof259;
 case 259:
-#line 5703 "http_parser.c"
+#line 5706 "http_parser.c"
 	switch( (*p) ) {
 		case 13: goto tr240;
 		case 100: goto st260;
@@ -6041,7 +6044,7 @@ case 266:
 	_test_eof: {}
 	_out: {}
 	}
-#line 468 "http_parser.rl"
+#line 471 "http_parser.rl"
 
   parser->cs = cs;
 

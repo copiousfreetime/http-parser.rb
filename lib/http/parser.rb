@@ -15,6 +15,7 @@ module Http
   #
   METHODS = [ COPY, DELETE, GET, HEAD, LOCK, MKCOL, MOVE, OPTIONS, 
               POST, PROPFIND, PROPPATCH, PUT, TRACE, UNLOCK ].freeze
+
   #
   # see ext/http-parser/http-parser_ext.c
   #
@@ -23,12 +24,25 @@ module Http
   #
   class Parser
     class Error < StandardError; end
+    
+    # if an exception is raised in a callback, then it is stored here
+    attr_reader :callback_exception
 
     #
-    # Parser should not be instantiated 
+    # Parser should not be initialized directly, it should be done via one of
+    # the child classes, RequestParser or ResponseParser.  This is here solely
+    # to initialize the callback data members.
     #
     def initialize
-      raise Error, "Do not instantiate Parser.  Instantiate either a RequestParser or a ResponseParser."
+      @on_message_begin_callback    = nil
+      @on_header_field_callback     = nil
+      @on_header_value_callback     = nil
+      @on_headers_complete_callback = nil
+      @on_body_callback             = nil
+      @on_message_complete_callback = nil
+      @on_error_callback            = nil
+
+      @callback_exception           = nil
     end
 
     ##
@@ -56,9 +70,19 @@ module Http
     def on_headers_complete( &block ) self.on_headers_complete= block  ; end
     def on_body( &block )             self.on_body = block             ; end
     def on_message_complete( &block ) self.on_message_complete = block ; end
+
+    ## 
+    # on error callback, which is not part of the underlying C parser callback
+    # system so it can be done in ruby
+    #
+    def on_error=(callable)
+      @on_error_callback = callable
+    end
+    def on_error(&block) self.on_error = block; end
+
   end
 end
 
 require 'http/parser_version'
-#require 'http/request_parser'
+require 'http/request_parser'
 #require 'http/response_parser'
