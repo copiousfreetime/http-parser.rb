@@ -16,6 +16,10 @@ describe Http::ResponseParser do
     called.should == 1
   end
 
+  it "has a default buffer size" do
+    @parser.buffer_size.should == 8192
+  end
+
   it "detects the HTTP version" do 
     @parser.on_message_complete do |p|
       p.version.should == "1.1"
@@ -44,9 +48,7 @@ describe Http::ResponseParser do
       count += 1
     end
     File.open( http_res_file("google")) do |f|
-      while chunk = f.read( 16 ) do
-        @parser.parse_chunk( chunk )
-      end
+      @parser.parse(f, 16)
     end
     count.should == 14
   end

@@ -15,7 +15,7 @@ describe Http::RequestParser do
       it "can set an #{cb} notification callback" do
         called = 0
         @parser.send("#{cb}=", lambda { |*args| called += 1 } )
-        @parser.parse_chunk( @firefox )
+        @parser.parse( @firefox )
         called.should == 1
       end
     end
@@ -25,21 +25,21 @@ describe Http::RequestParser do
     @parser.on_message_complete do |p|
       p.should be_chunked_encoding
     end
-    @parser.parse_chunk( IO.read( http_req_file( "all_your_base") ) )
+    @parser.parse( IO.read( http_req_file( "all_your_base") ) )
   end
 
   it "can detect the HTTP version" do
     @parser.on_message_complete do |p|
       p.version.should == "1.1"
     end
-    @parser.parse_chunk( @firefox )
+    @parser.parse( @firefox )
   end
 
   it "knows if keep alive was used" do
     @parser.on_message_complete do |p|
       p.should be_keep_alive
     end
-    @parser.parse_chunk( @firefox )
+    @parser.parse( @firefox )
   end
 
   it "resets the parser automatically after on_message_complete" do
@@ -48,7 +48,7 @@ describe Http::RequestParser do
     @parser.on_message_complete do |p|
       keep_alive = p.keep_alive?
     end
-    @parser.parse_chunk( @firefox )
+    @parser.parse( @firefox )
     keep_alive.should == true
     @parser.keep_alive?.should == false
   end
@@ -62,7 +62,7 @@ describe Http::RequestParser do
       @p.on_header_field do |p,data|
         header_fields << data.dup
       end
-      @p.parse_chunk( @firefox )
+      @p.parse( @firefox )
       header_fields.size.should == 8
     end
 
@@ -71,7 +71,7 @@ describe Http::RequestParser do
       @p.on_header_value do |p,data|
         header_values << data.dup
       end
-      @p.parse_chunk( @firefox )
+      @p.parse( @firefox )
       header_values.size.should == 8 
     end
 
@@ -81,7 +81,7 @@ describe Http::RequestParser do
         body = data.dup
       end
       text = IO.read( http_req_file( "base" ))
-      @p.parse_chunk( text )
+      @p.parse( text )
       body.length.should == 30
     end
 
@@ -90,7 +90,7 @@ describe Http::RequestParser do
       @p.on_path do |p, data|
         path = data.dup
       end
-      @p.parse_chunk( @uri )
+      @p.parse( @uri )
       path.should == "/forums/1/topics/2375"
     end
 
@@ -99,7 +99,7 @@ describe Http::RequestParser do
       @p.on_uri do |p, data|
         uri = data.dup
       end
-      @p.parse_chunk( @uri )
+      @p.parse( @uri )
       uri.should == "/forums/1/topics/2375?page=1"
     end
 
@@ -108,7 +108,7 @@ describe Http::RequestParser do
       @p.on_fragment do |p, data|
         fragment = data.dup
       end
-      @p.parse_chunk( @uri )
+      @p.parse( @uri )
       fragment.should == "posts-17408"
     end
  
@@ -117,7 +117,7 @@ describe Http::RequestParser do
       @p.on_query_string do |p, data|
         qs = data.dup
       end
-      @p.parse_chunk( @uri )
+      @p.parse( @uri )
       qs.should == "page=1"
     end
 
@@ -131,7 +131,7 @@ describe Http::RequestParser do
         p.callback_exception.should_not == nil
         p.callback_exception.message.should == "Woops! had an error [/forums/1/topics/2375?page=1]"
       end
-      @p.parse_chunk( @uri )
+      @p.parse( @uri )
 
     end
 
@@ -139,12 +139,12 @@ describe Http::RequestParser do
       @p.on_uri do |p, data|
         raise "Woops! had an error [#{data}]"
       end
-      lambda { @p.parse_chunk( @uri ) }.should raise_error( Http::Parser::Error, /Failure during parsing of chunk/)
+      lambda { @p.parse( @uri ) }.should raise_error( Http::Parser::Error, /Failure during parsing of chunk/)
       @p.callback_exception.message.should =~ /Woops! had an error/
     end
 
     it "raises an exception if there is an error in parsing" do
-      lambda { @p.parse_chunk( "hello world" ) }.should raise_error( Http::Parser::Error, /Failure during parsing of chunk/ )
+      lambda { @p.parse( "hello world" ) }.should raise_error( Http::Parser::Error, /Failure during parsing of chunk/ )
       @p.callback_exception.should == nil
     end
   end
@@ -154,21 +154,21 @@ describe Http::RequestParser do
       @parser.on_message_complete do |p|
         p.method.should == "GET"
       end
-      @parser.parse_chunk( @firefox )
+      @parser.parse( @firefox )
     end
 
     it "POST" do
       @parser.on_message_complete do |p|
         p.method.should == "POST"
       end
-      @parser.parse_chunk( IO.read( http_req_file("post_identity_body_world")))
+      @parser.parse( IO.read( http_req_file("post_identity_body_world")))
     end
 
     it "HEAD" do
       @parser.on_message_complete do |p|
         p.method.should == "HEAD"
       end
-      @parser.parse_chunk( IO.read( http_req_file("head_three_headers" )))
+      @parser.parse( IO.read( http_req_file("head_three_headers" )))
     end
   end
 
@@ -177,7 +177,7 @@ describe Http::RequestParser do
       it "#{File.basename( req_file )}" do
         count = 0
         @parser.on_message_complete = lambda {|p| count += 1}
-        @parser.parse_chunk( IO.read( req_file ) )
+        @parser.parse( IO.read( req_file ) )
         count.should == 1
       end
     end
