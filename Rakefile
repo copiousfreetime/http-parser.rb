@@ -27,11 +27,11 @@ require 'rake/clean'
 #-------------------------------------------------------------------------------
 require 'http/parser_version'
 Configuration.for("project") {
-  name      "http_parser"
+  name      "http-parser"
   version   Http::Parser::VERSION
   author    "Jeremy Hinegardner"
   email     "jeremy@copiousfreetime.org"
-  homepage  "http://http_parser.rubyforge.org/"
+  homepage  "http://copiousfreetime.rubyforge.org/http-parser"
 }
 
 #-------------------------------------------------------------------------------
