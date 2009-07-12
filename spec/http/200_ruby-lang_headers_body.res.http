@@ -1,0 +1,238 @@
+HTTP/1.1 200 OK
+Date: Sun, 12 Jul 2009 19:08:18 GMT
+Server: Apache/2.2.3 (Debian) DAV/2 SVN/1.4.2 mod_ruby/1.2.6 Ruby/1.8.5(2006-08-25) mod_ssl/2.2.3 OpenSSL/0.9.8c
+Transfer-Encoding: chunked
+Content-Type: text/html;charset=utf-8
+
+2f79
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Ruby Programming Language</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/low.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/screen.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/print.css" media="print" />
+    <link title="Low vision" rel="alternate stylesheet" type="text/css" href="/stylesheets/low_vision_screen.css" media="screen" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link href="/en/feeds/news.rss" rel="alternate" title="RSS" type="application/rss+xml" />
+    
+  </head>
+  <body id="home-page-layout">
+    <div id="page">
+      <div id="header">
+        <div id="logo"><img src="/images/logo.gif" width="331" height="119" alt="Ruby - A Programmer's Best Friend" title="" /></div>
+        <div class="site-links">
+<a href="/en/downloads/">Downloads</a><span class="separator"> | </span><a href="/en/documentation/">Documentation</a><span class="separator"> | </span><a href="/en/libraries/">Libraries</a><span class="separator"> | </span><a href="/en/community/">Community</a><span class="separator"> | </span><a href="/en/news/">News</a><span class="separator"> | </span><a href="/en/security/">Security</a><span class="separator"> | </span><a href="/en/about/">About Ruby</a>
+        </div>
+      </div>
+      <hr class="hidden-modern" />
+      <div id="main-wrapper">
+        <div id="main">
+          <div id="content-wrapper">
+            <div id="head-wrapper-1">
+              <div id="head-wrapper-2">
+                <div id="head">
+
+                  <div id="intro">
+                    <h1>Ruby is&#8230;</h1>
+                    <p>A dynamic, open source programming language with a focus on
+                      simplicity and productivity. It has an elegant syntax that is
+                      natural to read and easy to write.</p>
+                    <p><a href="about/">Read&nbsp;More&#8230;</a></p>
+                  </div>
+                  <div id="code">
+
+	  <div class="comment"># Ruby knows what you</div>
+	  <div class="comment"># mean, even if you</div>
+	  <div class="comment"># want to do math on</div>
+	  <div class="comment"># an entire Array</div>
+    <div>cities&nbsp;&nbsp;<span class="op">=</span> <span class="string">%w[ London</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">Oslo</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">Paris</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">Amsterdam</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">Berlin ]</span></div>
+    <div>visited <span class="op">=</span> <span class="string">%w[Berlin Oslo]</span></div>
+		<div class="blank-line">&nbsp;</div>
+    <div>puts <span class="string">"I still need "</span> <span class="op">+</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"to visit the "</span> <span class="op">+</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"following cities:"</span><span class="op">,</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cities <span class="op">-</span> visited</div>
+  
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="content">
+
+
+
+
+<div class="post">
+  <h3><a href="/en/news/2009/06/09/dos-vulnerability-in-bigdecimal/">DoS vulnerability in BigDecimal</a></h3>
+
+  <p>A denial of service (DoS) vulnerability was found on the BigDecimal
+standard library of Ruby.  Conversion from BigDecimal objects into
+Float numbers had a problem which enables attackers to effectively
+cause segmentation faults.</p>
+<p>ActiveRecord relies on this method, so most Rails applications are
+affected by this.  Though this is not a Rails-specific issue.</p>
+
+
+  <p><a href="/en/news/2009/06/09/dos-vulnerability-in-bigdecimal/">Continue&nbsp;Reading&#8230;</a></p>
+
+  <p class="post-info">Posted by Urabe Shyouhei on 09 Jun 2009</p>
+</div>
+
+
+<div class="post">
+  <h3><a href="/en/news/2009/05/23/ruby-1-8-6-maintenance-moved-to-engine-yard/">Ruby 1.8.6 maintenance moved to Engine Yard</a></h3>
+
+  <p>Recently we have a welcome, historic development that the Ruby
+1.8.6's maintenance stewardship moved from me (Urabe Shyouhei) to
+Kirk Haines of Engine Yard.</p>
+
+
+  <p><a href="/en/news/2009/05/23/ruby-1-8-6-maintenance-moved-to-engine-yard/">Continue&nbsp;Reading&#8230;</a></p>
+
+  <p class="post-info">Posted by Urabe Shyouhei on 23 May 2009</p>
+</div>
+
+
+
+<div id="news">
+  <h3><a href="/en/news/">Other News</a></h3>
+  <ul>
+    <li><a href="/en/news/2009/05/12/ruby-1-9-1-p129-released/">Ruby 1.9.1-p129 released</a>
+      <span class="post-info">Posted by Administrator on 12 May 2009</span></li>
+    <li><a href="/en/news/2009/04/18/ruby-1-8-7-p160-and-1-8-6-p368-released/">Ruby 1.8.7-p160 and 1.8.6-p368 released</a>
+      <span class="post-info">Posted by Urabe Shyouhei on 18 Apr 2009</span></li>
+    <li><a href="/en/news/2009/02/25/mountainwest-rubyconf-schedule/">MountainWest RubyConf Schedule</a>
+      <span class="post-info">Posted by james on 25 Feb 2009</span></li>
+  </ul>
+  <ul>
+    <li><a href="/en/news/2009/01/30/ruby-1-9-1-released/">Ruby 1.9.1 released</a>
+      <span class="post-info">Posted by james on 30 Jan 2009</span></li>
+    <li><a href="/en/news/2009/01/28/20090131-server-maintenance/">Server maintenance</a>
+      <span class="post-info">Posted by Shugo Maeda on 28 Jan 2009</span></li>
+    <li><a href="/en/news/2008/12/23/mountainwest-rubyconf-2009-proposal-deadline-approaching/">MountainWest RubyConf 2009 Proposal Deadline Approaching</a>
+      <span class="post-info">Posted by james on 23 Dec 2008</span></li>
+  </ul>
+  <p class="more"><a href="/en/news/">More&nbsp;News&#8230;</a></p>
+</div>
+
+
+
+
+            </div>
+          </div>
+          <hr class="hidden-modern" />
+          <div id="sidebar-wrapper">
+            <div id="sidebar">
+
+<div class="navigation"><a href="/en/downloads/"><img src="/images/download.gif" alt="Download Ruby" title="" /></a></div>
+
+
+<div class="navigation">
+  <h3><strong>Get Started,</strong> it&#8217;s easy!</h3>
+  <ul class="menu">
+    <li><a href="http://tryruby.hobix.com/">Try Ruby! (in your browser)</a></li>
+
+    <li><a href="/en/documentation/quickstart/">Ruby in Twenty Minutes</a></li>
+    <li><a href="/en/documentation/ruby-from-other-languages/">Ruby from Other Languages</a></li>
+  </ul>
+</div>
+
+<div class="navigation">
+  <h3><strong>Explore</strong> a new world&hellip;</h3>
+  <ul class="menu">
+    <li><a href="/en/documentation/">Documentation</a></li>
+    <li><a href="http://www.amazon.com/s/ref=sr_nr_n_5?ie=UTF8&amp;rs=1000&amp;keywords=Ruby&amp;rh=i%3Aaps%2Ck%3ARuby%2Ci%3Astripbooks%2Cn%3A1000%2Cn%3A5">Books</a></li>
+    <li><a href="/en/libraries/">Libraries</a></li>
+    <li><a href="/en/documentation/success-stories/">Success Stories</a></li>
+  </ul>
+</div>
+
+<div class="navigation">
+  <h3><strong>Participate</strong> in a friendly and growing community.</h3>
+  <ul>
+    <li><a href="/en/community/mailing-lists/">Mailing Lists</a>: Talk about Ruby with programmers from all around the world.</li>
+    <li><a href="/en/community/user-groups/">User Groups</a>: Get in contact with Rubyists in your area.</li>
+    <li><a href="/en/community/weblogs/">Weblogs</a>: Read about what&#8217;s happening right now in the Ruby community.</li>
+    <li><a href="/en/community/ruby-core/">Ruby Core</a>: Help polish the rough edges of the latest Ruby.</li>
+    <li><a href="http://redmine.ruby-lang.org/">Issue Tracking</a>: Report or help solve issues in Ruby.</li>
+  </ul>
+</div>
+
+
+<h3>Top Ruby Projects</h3>
+
+<ul>
+<li><a href="http://rubyforge.org/projects/rmagick/" title="An interface to the ImageMagick and GraphicsMagick image processing libraries. Supports over 100 image formats, including GIF, JPEG, PNG. See rmagick.rubyforge.org for prereqs, install FAQ, more.">RMagick</a></li>
+
+<li><a href="http://rubyforge.org/projects/ruby/" title="Main Ruby language project for providing a mirror of the Ruby releases, tracking bugs, etc.">Ruby</a></li>
+
+<li><a href="http://rubyforge.org/projects/win32utils/" title="The Win32Utils project is a series of libraries that provide Ruby interfaces to various Windows systems and services.
+This project only supports Windows 2000 and later.">Win32 Utils</a></li>
+
+<li><a href="http://rubyforge.org/projects/wtr/" title="Watir is a testing tool for automating browser-based tests of web applications. It is a Ruby library that works with Internet Explorer and Firefox.">Watir</a></li>
+
+<li><a href="http://rubyforge.org/projects/freeride/" title="The FreeRIDE project is a pure Ruby Integrated Development Environment.">FreeRIDE</a></li>
+
+</ul>
+<p class="more"><a href="/en/libraries/top-projects/">More&#8230;</a></p>
+
+
+<h3>Syndicate</h3>
+<p><a href="/en/feeds/news.rss">Recent News (RSS)</a></p>
+            </div>
+          </div>
+          <hr class="hidden-modern" />
+          <div class="foot">
+            <div class="site-links">
+<a href="/en/downloads/">Downloads</a><span class="separator"> | </span><a href="/en/documentation/">Documentation</a><span class="separator"> | </span><a href="/en/libraries/">Libraries</a><span class="separator"> | </span><a href="/en/community/">Community</a><span class="separator"> | </span><a href="/en/news/">News</a><span class="separator"> | </span><a href="/en/security/">Security</a><span class="separator"> | </span><a href="/en/about/">About Ruby</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="search-box">
+<form id="search-form" action="http://www.google.com/cse">
+  <table class="fieldset">
+    <tr>
+      <td>
+        <input class="field" type="text" name="q" size="31" style="background: white url(http://www.google.com/coop/intl/en/images/google_custom_search_watermark.gif) left no-repeat" onfocus="this.style.background='white'" onblur="if (/^\s*$/.test(this.value)) this.style.background='white url(http://www.google.com/coop/intl/en/images/google_custom_search_watermark.gif) left no-repeat'"/>
+      </td>
+      <td>
+        <input type="hidden" name="cx" value="013598269713424429640:g5orptiw95w" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input class="button" type="submit" name="sa" value="Search" />
+      </td>
+    </tr>
+  </table>
+</form>
+      </div>
+      <div id="footer">
+        <div class="fine-print">
+          <p>Content available in <a href="/en/">English</a>, <a href="/fr/">French</a>, <a href="/ja/">Japanese</a>, <a href="/ko/">Korean</a>, <a href="/pl/">Polish</a>, <a href="/es/">Spanish</a>, <a href="/pt/">Portuguese</a>, <a href="/zh_CN/">Simplified Chinese</a>, <a href="/zh_TW/">Traditional Chinese</a>, <a href="/id/">Bahasa Indonesia</a>, <a href="/de/">German</a> and <a href="/it/">Italian</a>.</p> 
+          <p>This website is made with Ruby and powered by <a href="http://radiantcms.org">Radiant CMS</a>.
+            It is proudly maintained by <a href="http://rubyidentity.org">members of the Ruby community</a>. Please contact
+            our <a href="mailto:webmaster@ruby-lang.org">webmaster</a> for questions or comments
+            concerning this website.</p>
+        </div>
+      </div>
+    </div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript" defer="defer">
+// <![CDATA[
+_uacct = "UA-620926-1";
+urchinTracker();
+// ]]>
+</script>
+  </body>
+</html>
+
+0
+
