@@ -1,0 +1,2 @@
+http_parser.c: http_parser.rl
+	ragel -s -G2 $? -o  $@
