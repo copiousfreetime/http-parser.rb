@@ -339,7 +339,7 @@ VALUE hpe_parser_content_length( VALUE self )
 
     Data_Get_Struct( self, http_parser, parser );
     content_length = parser->content_length;
-    rc = UULL2NUM( content_length );
+    rc = ULL2NUM( content_length );
    
     return rc;
 }
@@ -500,7 +500,7 @@ void Init_http_parser_ext()
     rb_define_method( cHttpParser, "chunked_encoding?" ,hpe_parser_chunked_encoding , 0 );
     rb_define_method( cHttpParser, "version"           ,hpe_parser_version          , 0 );
     rb_define_method( cHttpParser, "keep_alive?"       ,hpe_parser_keep_alive       , 0 );
-    rb_define_method( cHttpParser, "content_length?"   ,hpe_parser_content_length   , 0 );
+    rb_define_method( cHttpParser, "content_length"    ,hpe_parser_content_length   , 0 );
     rb_define_method( cHttpParser, "reset"             ,hpe_parser_reset            , 0 );
     rb_define_method( cHttpParser, "parse_chunk"       ,hpe_parser_parse_chunk      , 1 );
 

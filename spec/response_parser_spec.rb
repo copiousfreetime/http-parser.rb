@@ -61,4 +61,14 @@ describe Http::ResponseParser do
       end
     end
   end
+
+  it "knows the content length" do
+    cl = nil
+    @parser.on_headers_complete do |p|
+      cl = p.content_length
+    end
+    @parser.parse_chunk( IO.read( http_res_file( "google" ) ) )
+    cl.should == 219
+  end
+
 end
