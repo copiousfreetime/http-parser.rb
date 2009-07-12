@@ -15,4 +15,50 @@ describe Http::ResponseParser do
     @parser.parse_chunk( IO.read( http_res_file( "google" ) ) )
     called.should == 1
   end
+
+  it "detects the HTTP version" do 
+    @parser.on_message_complete do |p|
+      p.version.should == "1.1"
+    end
+    @parser.parse_chunk( IO.read( http_res_file( "google" ) ) )
+  end
+
+  describe "detects status code" do
+    it "404" do
+      @parser.on_message_complete do |p|
+        p.status_code.should == 404
+      end
+      @parser.parse_chunk( IO.read( http_res_file( "404_headers" ) ))
+    end
+    it "301" do
+      @parser.on_message_complete do |p|
+        p.status_code.should == 301
+      end
+      @parser.parse_chunk( IO.read( http_res_file( "google" ) ))
+    end
+  end
+
+  it "parses w/ multiple calls to parse_chunk" do
+    count = 0
+    @parser.on_body do |p,d|
+      count += 1
+    end
+    File.open( http_res_file("google")) do |f|
+      while chunk = f.read( 16 ) do
+        @parser.parse_chunk( chunk )
+      end
+    end
+    count.should == 14
+  end
+
+  describe "Parses files" do
+    http_files( "res").each do |res_file|
+      it "#{File.basename(res_file)}" do
+        count = 0
+        @parser.on_message_complete = lambda {|p| count += 1}
+        @parser.parse_chunk( IO.read( res_file ) )
+        count.should == 1
+      end
+    end
+  end
 end

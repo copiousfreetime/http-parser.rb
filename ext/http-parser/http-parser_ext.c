@@ -210,23 +210,53 @@ VALUE hpe_parser_status_code( VALUE self )
 VALUE hpe_parser_method( VALUE self )
 {
     http_parser *parser;
+    ID           const_get = rb_intern("const_get");
+    VALUE        method; 
 
     Data_Get_Struct( self, http_parser, parser );
     switch ( parser->method ) {
-    case HTTP_COPY:      return rb_mod_const_get( mHttp, "COPY" );      break;
-    case HTTP_DELETE:    return rb_mod_const_get( mHttp, "DELETE" );    break;
-    case HTTP_GET:       return rb_mod_const_get( mHttp, "GET" );       break;
-    case HTTP_HEAD:      return rb_mod_const_get( mHttp, "HEAD" );      break;
-    case HTTP_LOCK:      return rb_mod_const_get( mHttp, "LOCK" );      break;
-    case HTTP_MKCOL:     return rb_mod_const_get( mHttp, "MKCOL");      break;
-    case HTTP_MOVE:      return rb_mod_const_get( mHttp, "MOVE");       break;
-    case HTTP_OPTIONS:   return rb_mod_const_get( mHttp, "OPTIONS");    break;
-    case HTTP_POST:      return rb_mod_const_get( mHttp, "POST");       break;
-    case HTTP_PROPFIND:  return rb_mod_const_get( mHttp, "PROPFIND");   break;
-    case HTTP_PROPPATCH: return rb_mod_const_get( mHttp, "PROPPATCH" ); break;
-    case HTTP_PUT:       return rb_mod_const_get( mHttp, "PUT");        break;
-    case HTTP_TRACE:     return rb_mod_const_get( mHttp, "TRACE");      break;
-    case HTTP_UNLOCK:    return rb_mod_const_get( mHttp, "UNLOCK");     break;
+    case HTTP_COPY:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("COPY"));       
+        break;
+    case HTTP_DELETE:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("DELETE"));
+        break;
+    case HTTP_GET:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("GET" ));
+        break;
+    case HTTP_HEAD:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("HEAD" ));
+        break;
+    case HTTP_LOCK:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("LOCK" ));
+        break;
+    case HTTP_MKCOL:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("MKCOL"));
+        break;
+    case HTTP_MOVE:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("MOVE"));
+        break;
+    case HTTP_OPTIONS:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("OPTIONS"));
+        break;
+    case HTTP_POST:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("POST"));
+        break;
+    case HTTP_PROPFIND:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("PROPFIND"));
+        break;
+    case HTTP_PROPPATCH:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("PROPPATCH" ));
+        break;
+    case HTTP_PUT:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("PUT"));
+        break;
+    case HTTP_TRACE:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("TRACE"));
+        break;
+    case HTTP_UNLOCK:
+        method = rb_funcall( mHttp, const_get, 1, rb_str_new2("UNLOCK"));
+        break;
     default:
       rb_raise(eHttpParserError, "Invalid Request Method");
       break;

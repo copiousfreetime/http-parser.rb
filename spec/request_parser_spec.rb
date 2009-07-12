@@ -21,6 +21,20 @@ describe Http::RequestParser do
     end
   end
 
+  it "knows if chunked encoding is used" do
+    @parser.on_message_complete do |p|
+      p.should be_chunked_encoding
+    end
+    @parser.parse_chunk( IO.read( http_req_file( "all_your_base") ) )
+  end
+
+  it "can detect the HTTP version" do
+    @parser.on_message_complete do |p|
+      p.version.should == "1.1"
+    end
+    @parser.parse_chunk( @firefox )
+  end
+
   it "knows if keep alive was used" do
     @parser.on_message_complete do |p|
       p.should be_keep_alive
@@ -132,6 +146,40 @@ describe Http::RequestParser do
     it "raises an exception if there is an error in parsing" do
       lambda { @p.parse_chunk( "hello world" ) }.should raise_error( Http::Parser::Error, /Failure during parsing of chunk/ )
       @p.callback_exception.should == nil
+    end
+  end
+
+  describe "HTTP Methods" do
+    it "GET" do
+      @parser.on_message_complete do |p|
+        p.method.should == "GET"
+      end
+      @parser.parse_chunk( @firefox )
+    end
+
+    it "POST" do
+      @parser.on_message_complete do |p|
+        p.method.should == "POST"
+      end
+      @parser.parse_chunk( IO.read( http_req_file("post_identity_body_world")))
+    end
+
+    it "HEAD" do
+      @parser.on_message_complete do |p|
+        p.method.should == "HEAD"
+      end
+      @parser.parse_chunk( IO.read( http_req_file("head_three_headers" )))
+    end
+  end
+
+  describe "Parses files" do
+    http_files( "req").each do |req_file|
+      it "#{File.basename( req_file )}" do
+        count = 0
+        @parser.on_message_complete = lambda {|p| count += 1}
+        @parser.parse_chunk( IO.read( req_file ) )
+        count.should == 1
+      end
     end
   end
 end
