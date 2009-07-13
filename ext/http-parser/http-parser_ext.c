@@ -347,29 +347,6 @@ VALUE hpe_parser_content_length( VALUE self )
 
 /*
  * call-seq:
- *   parser.reset -> nil
- *
- * Reset the state of the parser to what it was upon initial
- * instantiation.  This resets the internal state machine and allows it
- * to be used again.
- *
- * Also be aware, that immediately following the +on_message_complete+
- * callback the Parser is also implicitly reset.  Callbacks ARE NOT
- * unregistered after a reset.
- *
- */
-VALUE hpe_parser_reset( VALUE self )
-{
-    http_parser *parser;
-    VALUE        rc;
-
-    Data_Get_Struct( self, http_parser, parser );
-    RESET_PARSER( parser );
-    return Qnil;
-}
-
-/*
- * call-seq:
  *   parser.parse_chunk( String ) -> nil
  *
  * Parse the given hunk of data invoking the callbacks as appropriate.
@@ -499,7 +476,6 @@ void Init_http_parser_ext()
     rb_define_method( cHttpParser, "version"           ,hpe_parser_version          , 0 );
     rb_define_method( cHttpParser, "keep_alive?"       ,hpe_parser_keep_alive       , 0 );
     rb_define_method( cHttpParser, "content_length"    ,hpe_parser_content_length   , 0 );
-    rb_define_method( cHttpParser, "reset"             ,hpe_parser_reset            , 0 );
     rb_define_method( cHttpParser, "parse_chunk"       ,hpe_parser_parse_chunk      , 1 );
 
     /* the common callbacks */

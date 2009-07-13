@@ -147,8 +147,7 @@ module Http
     # an exception that happened inside a callback.
     #
     # After recieving an on_error callback, the parser is no longer useful in
-    # its current state.  It should either be disposed of, or call
-    # +parser.reset+ to reset it to its initial state.
+    # its current state.  It should be disposed of.
     #
     def on_error=(callable)
       @on_error_callback = callable
