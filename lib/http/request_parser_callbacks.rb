@@ -1,6 +1,9 @@
 require 'http/parser_callbacks'
 module Http
   #
+  # This is a container module to hold the documentation and information about
+  # ParserCallbacks.  This module is included in the Http::RequestParser class.
+  #
   # These are additional callbacks that are available from RequestParser
   # instances.
   #
@@ -15,6 +18,9 @@ module Http
   #
   # All of them are data callbacks and so receive to parameters, first the
   # parser instance itself and then the data.
+  #
+  # These callbacks will be invoked between the +on_message_begin+ and 
+  # +on_header_field+ callbacks.
   #
   module RequestParserCallbacks
     include ParserCallbacks
@@ -62,5 +68,19 @@ module Http
     # Request-Line after the Method and before the HTTP Version.
     #
     def on_uri( &block )           self.on_uri = block          ; end
+
+    #
+    # call-seq:
+    #   RequestParserCallbacks.callback_methods -> Array
+    #
+    # Return an array of strings for all the callback methods.
+    #
+    def callback_methods
+      @callback_methods ||= ParserCallbacks.callback_methods + 
+                            %w[ on_path on_query_string
+                                on_uri on_fragment ]
+    end
+    module_function :callback_methods
+ 
   end
 end

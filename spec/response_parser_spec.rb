@@ -73,4 +73,26 @@ describe Http::ResponseParser do
     cl.should == 219
   end
 
+  it "knows what its callbacks are" do
+    @parser.callback_methods.size.should == 7
+  end
+
+
+  it "can bind callbacks" do
+    class C
+      attr_accessor :callback_hits
+      def initialize
+        @callback_hits = 0
+      end
+      def on_message_begin(p) @callback_hits += 1; end
+      def on_headers_complete(p) @callback_hits += 1; end
+      def on_message_complete(p) @callback_hits += 1; end
+      def on_error(p,d)
+        puts "Had an error with #{p.callback_exception}"
+      end
+    end
+    c = C.new
+    @parser.bind_and_parse( c, IO.read( http_res_file( "google" ) ) )
+    c.callback_hits.should == 3
+  end
 end

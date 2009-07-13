@@ -1,7 +1,7 @@
 module Http
   #
   # This is a container module to hold the documentation and information about
-  # ParserCallbacks.
+  # ParserCallbacks.  This module is included in the Http::Parser class.
   #
   # There is a single parser that is used for both Request parsing and Response
   # parsing.  The RequestParser has a few more callbacks and those are
@@ -26,11 +26,11 @@ module Http
   #
   # The lifecyle of the callbacks is as follows
   #
-  # 1 a single call to on_message_begin
-  # 2 multiple calls to on_header_field and on_header_value 
-  # 3 a single call to on_headers_complete
-  # 4 multiple calls to on_body
-  # 5 a single call to on_message_complete
+  # - a single call to on_message_begin
+  # - multiple calls to on_header_field and on_header_value 
+  # - a single call to on_headers_complete
+  # - multiple calls to on_body
+  # - a single call to on_message_complete
   #
   #
   # All callbacks have 2 registration forms, the block form:
@@ -49,7 +49,6 @@ module Http
   # The last callback is the on_error callback.
   #
   module ParserCallbacks
-
     #
     # call-seq:
     #   parser.on_message_begin { |parser| ... }
@@ -91,7 +90,6 @@ module Http
     # The same caveats for on_header_field applied to on_header_value
     #
     def on_header_value( &block )     self.on_header_value = block     ; end
-
 
     #
     # call-seq:
@@ -136,7 +134,6 @@ module Http
     # call.  
     def on_message_complete( &block ) self.on_message_complete = block ; end
 
-
     #
     # call-seq:
     #   parser.on_error { |parser, data| ... }
@@ -157,5 +154,47 @@ module Http
       @on_error_callback = callable
     end
     def on_error(&block) self.on_error = block; end
+
+    #
+    # call-seq:
+    #   ParserCallbacks.callback_methods -> Array
+    #
+    # Return an array of strings for all the callback methods.
+    #
+    def callback_methods
+      @callback_methods ||= %w[ on_message_begin on_header_field on_header_value
+                                on_headers_complete on_body on_message_complete
+                                on_error ]
+    end
+    #
+    # call-seq:
+    #   parser.bind_callbacks_to( obj )
+    #
+    # Bind every method of obj that has the same name as a callback to the
+    # callback in the parser.
+    #
+    # The methods that are extracted from obj and bound to the parser are
+    # returned from the +methods+ method in the Module.
+    #
+    def bind_callbacks_to( obj )
+      callback_methods.each do |cb_name|
+        if obj.respond_to?( cb_name ) then
+          cb_method = obj.method( cb_name )
+          self.send( "#{cb_name}=", cb_method )
+        end
+      end
+    end
+
+    #
+    # call-seq:
+    #   parser.unbind_callbacks -> nil
+    #
+    # Unbind all callbacks on this parser.
+    #
+    def unbind_callbacks_to( obj )
+      callback_methods.each do |cb_name|
+        self.send( "#{cb_name}=", nil )
+      end
+    end
   end
 end

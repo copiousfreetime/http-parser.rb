@@ -120,7 +120,8 @@ module Http
     # more input.
     #
     def bind_and_parse( bindable, io_or_string, chunk_size = self.buffer_size)
-
+      bind_callbacks_to( bindable )
+      parse( io_or_string, chunk_size)
     end
   end
 end
