@@ -59,7 +59,9 @@ describe Http::ResponseParser do
       it "#{File.basename(res_file)}" do
         count = 0
         @parser.on_message_complete = lambda {|p| count += 1}
-        @parser.parse_chunk( IO.read( res_file ) )
+        File.open( res_file ) do |f|
+          @parser.parse( f, 10 )
+        end
         count.should == 1
       end
     end

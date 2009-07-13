@@ -1,0 +1,14 @@
+HTTP/1.1 301
+Date: Mon, 13 Jul 2009 06:53:43 GMT
+Server: Apache
+Cache-Control: no-cache, must-revalidate, max-age=0
+Expires: Wed, 11 Jan 1984 05:00:00 GMT
+Pragma: no-cache
+X-Pingback: http://androgeek.com/xmlrpc.php
+X-Powered-By: PHP/4.4.9
+Set-Cookie: wpgb_visit_last_php-default=1247468023; expires=Tue, 13 Jul 2010 06:53:43 GMT; path=/
+Last-Modified: Mon, 13 Jul 2009 06:53:43 GMT
+Location: http://androgeek.com/the-improved-iphone-3gs-and-its-influence-on-the-gaming-industry.html
+Connection: close
+Content-Type: text/html; charset=UTF-8
+
