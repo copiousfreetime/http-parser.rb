@@ -33,7 +33,7 @@ Configuration.for('packaging') {
     data      FileList["data/**/*"]
     tasks     FileList["tasks/**/*.r{ake,b}"]
     rdoc      FileList[proj_conf.readme, proj_conf.history,
-                       proj_conf.license] + lib + FileList["ext/http-parser/http-parser_ext*.c"]
+                       proj_conf.license] + lib + FileList["ext/http-parser/http-parser_ext.c"]
     all       bin + ext + lib + test + data + rdoc + tasks 
   }
 

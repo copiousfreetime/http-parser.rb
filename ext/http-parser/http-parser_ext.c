@@ -354,7 +354,8 @@ VALUE hpe_parser_content_length( VALUE self )
  * to be used again.
  *
  * Also be aware, that immediately following the +on_message_complete+
- * callback the Parser is also implicitly reset.
+ * callback the Parser is also implicitly reset.  Callbacks ARE NOT
+ * unregistered after a reset.
  *
  */
 VALUE hpe_parser_reset( VALUE self )
@@ -461,9 +462,6 @@ VALUE hpe_response_parser_initialize( VALUE self )
 }
 
 
-/*
- *
- */
 void Init_http_parser_ext()
 {
     mHttp               = rb_define_module( "Http" );
@@ -497,7 +495,7 @@ void Init_http_parser_ext()
     /******************************************************************
      * Http::Parser 
     ******************************************************************/
-    rb_define_method( cHttpParser, "chunked_encoding?" ,hpe_parser_chunked_encoding , 0 );
+    rb_define_method( cHttpParser, "chunked_encoding?" ,hpe_parser_chunked_encoding , 0 ); 
     rb_define_method( cHttpParser, "version"           ,hpe_parser_version          , 0 );
     rb_define_method( cHttpParser, "keep_alive?"       ,hpe_parser_keep_alive       , 0 );
     rb_define_method( cHttpParser, "content_length"    ,hpe_parser_content_length   , 0 );
