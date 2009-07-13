@@ -30,6 +30,9 @@ module Http
     # beginning of the response body
     attr_accessor :body
 
+    # if we are bound to a parser, this is a handle to it
+    attr_accessor :parser
+
     def initialize
       # obtain these from the parser at on_headers_complete
       @headers = nil
@@ -86,6 +89,7 @@ module Http
       @header_token         = StringIO.new
       @content_length       = 0
       @body                 = StringIO.new
+      @parser               = parser
     end
 
     #
@@ -162,6 +166,22 @@ module Http
     def on_error( parser, data )
       parser.unbind_callbacks
       @had_error = true
+      @parser = parser
+      @bad_data = data.dup
+    end
+
+    def report_error
+      $stderr.puts "Had error : #{had_error?}"
+      if @parser.callback_exception then
+        $stderr.puts "Callback Exception : #{@parser.callback_exception}"
+        $stderr.puts "Backtrace          :"
+        @parser.callback_exception.backtrace.each do |l|
+          $stderr.puts "    #{l.strip}"
+        end
+      end
+      $stderr.puts "Internal parser error : #{@parser.internal_parser_error?}"
+      $stderr.puts "Error content follows:"
+      $stderr.puts "<<<#{@bad_data}>>>"
     end
 
     #########
