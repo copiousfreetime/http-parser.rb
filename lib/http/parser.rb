@@ -73,7 +73,14 @@ module Http
       @on_error_callback            = nil
 
       @callback_exception           = nil
+      @internal_parser_error        = nil
       @buffer_size                  = Parser.default_buffer_size
+    end
+
+    # this is set if the C http-parser had an error and it was not an error in a
+    # callback
+    def internal_parser_error?
+      @internal_parser_error
     end
 
     #
@@ -126,7 +133,9 @@ module Http
   end
 end
 
+require 'http/headers'
 require 'http/parser_version'
-require 'http/status'
 require 'http/request_parser'
+require 'http/response'
+require 'http/status'
 #require 'http/response_parser'

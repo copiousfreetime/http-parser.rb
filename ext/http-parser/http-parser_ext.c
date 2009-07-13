@@ -376,6 +376,12 @@ VALUE hpe_parser_parse_chunk( VALUE self, VALUE chunk )
 
     if ( http_parser_has_error( parser ) ) {
         VALUE callback = rb_iv_get( self, "@on_error_callback" );
+        VALUE exception = rb_iv_get( self, "@callback_exception" );
+
+        if ( Qnil == exception ) {
+            rb_iv_set( self, "@internal_parser_error", Qtrue );
+        }
+
         if ( Qnil == callback ) {
             rb_raise(eHttpParserError, "Failure during parsing of chunk [%s]",
                     chunk_p);

@@ -47,6 +47,7 @@ module Http
       @header_token = nil
       @header_fields_values = nil
 
+      @had_error = false
     end
 
     def chunked_encoding?
@@ -55,6 +56,14 @@ module Http
 
     def keep_alive?
       @keep_alive
+    end
+
+    def had_error?
+      @had_error
+    end
+
+    def headers_parsed?
+      not @headers.nil?
     end
 
     # call-seq:
@@ -124,6 +133,10 @@ module Http
       @status_code      = parser.status_code
       @keep_alive       = parser.keep_alive?
       @chunked_encoding = parser.chunked_encoding?
+
+      @header_state = nil
+      @header_fields_values = nil
+      @header_token = nil
     end
 
     #
@@ -141,6 +154,14 @@ module Http
     #
     def on_message_complete( parser )
       parser.unbind_callbacks
+    end
+
+    #
+    # On errors we unbind, save the  
+    #
+    def on_error( parser, data )
+      parser.unbind_callbacks
+      @had_error = true
     end
 
     #########

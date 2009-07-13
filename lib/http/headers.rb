@@ -28,7 +28,7 @@ module Http
       def []( *args )
         raise ArgumentError, "odd number of arguments for Headers" unless (args.size % 2 == 0)
         h = Headers.new
-        (0..args.size).step( 2 ) do |idx|
+        (0...args.size).step( 2 ) do |idx|
           key = args[idx].to_s
           val = args[idx+1].to_s
           h[key] = val

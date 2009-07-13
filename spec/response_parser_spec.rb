@@ -55,6 +55,7 @@ describe Http::ResponseParser do
 
   describe "Parses files" do
     http_files( "res").each do |res_file|
+      next if res_file =~ /200_headers_0_chunked/
       it "#{File.basename(res_file)}" do
         count = 0
         @parser.on_message_complete = lambda {|p| count += 1}
@@ -62,6 +63,10 @@ describe Http::ResponseParser do
         count.should == 1
       end
     end
+  end
+
+  it "has an error on in valid chunked body" do
+    lambda { @parser.parse( IO.read( http_res_file( "200_headers_0_chunked" ) ) ) }.should raise_error( Http::Parser::Error, /Failure during parsing of chunk/ )
   end
 
   it "knows the content length" do
