@@ -9,13 +9,16 @@ rescue LoadError => le
   require 'http-parser/http_parser_ext' # for dev work
 end
 
+require 'http/parser_callbacks'
+
 module Http
   #
   # The list of methods defined in the extension
   #
-  METHODS = [ COPY, DELETE, GET, HEAD, LOCK, MKCOL, MOVE, OPTIONS, 
-              POST, PROPFIND, PROPPATCH, PUT, TRACE, UNLOCK ].freeze
-
+  def Http::Methods
+    @methods ||= [ COPY, DELETE, GET, HEAD, LOCK, MKCOL, MOVE, OPTIONS, 
+                   POST, PROPFIND, PROPPATCH, PUT, TRACE, UNLOCK ].freeze
+  end
   #
   # see ext/http-parser/http-parser_ext.c
   #
@@ -52,7 +55,7 @@ module Http
     # if an exception is raised in a callback, then it is stored here
     attr_reader :callback_exception
 
-    # the size of read/write buffers parses should use if they are using buffers
+    # the size of read/write buffers parsers should use if they are using buffers
     attr_accessor :buffer_size
 
     #
@@ -104,45 +107,25 @@ module Http
       end
     end
 
+    include ParserCallbacks
+    #
+    # call-seq:
+    #   parser.bind_and_parse( bindable, io_or_string, chunk_size ) -> nil
+    #
+    # Take the given object, and bind any of its methods that match any of the
+    # callback methods to the parser.  See the ParserCallbacks and 
+    # RequestParserCallbacks for more detail on the methods themselves.
+    #
+    # Once the +bindable+ object is bound, the parser is run until there is no
+    # more input.
+    #
+    def bind_and_parse( bindable, io_or_string, chunk_size = self.buffer_size)
 
-    ##
-    # Callbacks, the can either be invoked as a block, or be assigned directly.
-    # 
-    # Take for instance, the +on_header_field+ callback.  It can be assigned
-    # either via a block notation, or assigned to directly as something that
-    # responds to +call+.
-    #
-    #   parser.on_header_field do |field|
-    #   ...
-    #   end
-    #
-    # or
-    #
-    #   parser.on_header_field = lambda { |field| ... }
-    #
-    # or
-    #
-    #   parser.on_header_field = HeaderFieldDoSometing.new # this class responds to +call+
-    #
-    def on_message_begin( &block )    self.on_message_begin = block    ; end
-    def on_header_field( &block )     self.on_header_field = block     ; end
-    def on_header_value( &block )     self.on_header_value = block     ; end
-    def on_headers_complete( &block ) self.on_headers_complete= block  ; end
-    def on_body( &block )             self.on_body = block             ; end
-    def on_message_complete( &block ) self.on_message_complete = block ; end
-
-    ## 
-    # on error callback, which is not part of the underlying C parser callback
-    # system so it can be done in ruby
-    #
-    def on_error=(callable)
-      @on_error_callback = callable
     end
-    def on_error(&block) self.on_error = block; end
-
   end
 end
 
 require 'http/parser_version'
+require 'http/status'
 require 'http/request_parser'
 #require 'http/response_parser'
