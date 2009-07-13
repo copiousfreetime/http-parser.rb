@@ -65,7 +65,7 @@ module Http
     #   HTTP-Version Status-Code Reason-Phrase CRLF
     # 
     def status_line
-      "HTTP/#{protocol_version} #{status} #{Status.reason_for( status_code )}\r\n"
+      "HTTP/#{protocol_version} #{status_code} #{Status.reason_for( status_code )}\r\n"
     end
 
     #------------------------------------------------------------------
@@ -134,6 +134,13 @@ module Http
       @content_length ||= 0
 
       @content_length += @body.write( data )
+    end
+
+    #
+    # When the message is done, be nice and unbind from the parser
+    #
+    def on_message_complete( parser )
+      parser.unbind_callbacks
     end
 
     #########

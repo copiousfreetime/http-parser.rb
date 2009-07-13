@@ -191,10 +191,11 @@ module Http
     #
     # Unbind all callbacks on this parser.
     #
-    def unbind_callbacks_to( obj )
+    def unbind_callbacks
       callback_methods.each do |cb_name|
         self.send( "#{cb_name}=", nil )
       end
+      nil
     end
   end
 end
